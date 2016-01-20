@@ -11,9 +11,16 @@ class Node( object ):
         return self.truePath if testPassed else self.falsePath
 
     def newFalsePath( self, attr, dataSubset ):
-        self.falsePath = Node( attr, self.attributes.remove( attr ), dataSubset )
+        falsePathAttributes = self.attributes
+        falsePathAttributes.remove( attr )
+        print( "New False Path:", self.attributes )
+        self.falsePath = Node( attr, falsePathAttributes, dataSubset )
+
     def newTruePath ( self, attr, dataSubset ):
-        self.truePath  = Node( attr, self.attributes.remove( attr ), dataSubset )
+        truePathAttributes = self.attributes
+        truePathAttributes.remove( attr )
+        print( "New True Path:", truePathAttributes )
+        self.truePath  = Node( attr, truePathAttributes, dataSubset )
 
 
 

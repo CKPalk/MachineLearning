@@ -49,29 +49,31 @@ def resultsOfSet( S ):
 
 def findBestAttribute( S, attrs ):
     bestAttributeAndGain = ( 'temp attribute', -1 )
-    print( "-- Gain --" )
+    print( "+--  Gain  ---" )
     for attr in attrs:
         attrGain = Gain( S, attr )
-        print( attr, attrGain )
+        print( "|", attr, "%0.7f" % ( attrGain ) )
         if attrGain > bestAttributeAndGain[ 1 ]:
             bestAttributeAndGain = ( attr, attrGain )
-    print( "Choosing", bestAttributeAndGain[0] )
+    print( "+-------------" )
+    print( " > Best attribute:", bestAttributeAndGain[0], "\n" )
     return bestAttributeAndGain[ 0 ]
 
 def createNextNode( parent ):
-    falseParentDataSubset = setWithLabel( parent.dataSet, parent.attribute, False )
-    falseBestAttribute = findBestAttribute( falseParentDataSet, parent.attributes )
 
-    trueParentDataSubset = setWithLabel( parent.dataSet, parent.attribute, True )
-    trueBestAttribute  = findBestAttribute( trueParentDataSubset, parent.attributes )
+	if len( parent.attributes ) == 0: # No remaining attributes
+		return
 
-    parent.newFalsePath( 
-            falseBestAttribute, falseParentDataSubset )
-    parent.newTruePath(
-            trueBestAttribute,  trueParentDataSubset  )
+	falseParentDataSubset = setWithLabel( parent.dataSet, parent.attribute, False )
+	falseBestAttribute = findBestAttribute( falseParentDataSubset, parent.attributes )
+	parent.newFalsePath( falseBestAttribute, falseParentDataSubset )
 
-    createNextNode( parent.falsePath )
-    createNextNode( parent.truePath  )
+	trueParentDataSubset = setWithLabel( parent.dataSet, parent.attribute, True )
+	trueBestAttribute = findBestAttribute( trueParentDataSubset, parent.attributes )
+	parent.newTruePath( trueBestAttribute, trueParentDataSubset )
+
+	createNextNode( parent.falsePath )
+	createNextNode( parent.truePath  )
 
 
 
@@ -82,10 +84,7 @@ def createDecisionTree():
     rootAttributes = attributes[:-1]
     bestAttribute = findBestAttribute( data, rootAttributes )
     tree.newRoot( bestAttribute, rootAttributes, data )
-    print( "BEST ATTRIBUTE:", bestAttribute )
     createNextNode( tree.root )
-    tree.root.newFalsePath( "XE", setWithLabel( data, "XE", False ) )
-    tree.root.newTruePath( "XF", setWithLabel( data, "XF", True ) )
 
     return tree
 
@@ -102,22 +101,21 @@ def main( argv ):
     if len(argv) != 3:
         return print( "ERROR: Usage \"python3 id3 <train> <test> <model>\"" )
 
-    global attributes
-    global data
     tup = CSVReader.readBooleanCSV( argv[0] )
-    attributes = tup[ 0 ]
-    data = tup[ 1 ]
+    global attributes; attributes  = tup[ 0 ]
+    global data      ; data        = tup[ 1 ]
 
-    print( "Attributes:\n", ', '.join( attributes ) )
 
-    print( indexOfAttribute( "XD" ) )
-    print( AttributeLabels( data, "XD" ) )
+    print( "Attributes:\n", ', '.join( attributes ), "\n" )
+
+    #print( indexOfAttribute( "XD" ) )
+    #print( AttributeLabels( data, "XD" ) )
 
     #for row in setWithLabel( data, "XD", 1 ):
         #print( row )
 
-    print( resultsOfSet( setWithLabel( data, "XD", 1 ) ) )
-    print( Gain( data, "XF" ) )
+    #print( resultsOfSet( setWithLabel( data, "XD", 1 ) ) )
+    #print( Gain( data, "XF" ) )
 
     tree = createDecisionTree()
     
