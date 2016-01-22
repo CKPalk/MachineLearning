@@ -11,84 +11,113 @@ import DecisionTree
 attributes = list()
 data = list(list())
 
+pre_prune_tree = True
 
 
 # MATH FUNCTIONS
 def Entropy( yesNo ):
-    yes = yesNo[0]; no = yesNo[1]
-    if no == 0 or yes == 0: return 0
-    total = no + yes
-    return ( -( yes / total ) * math.log( yes / total, 2 ) 
-            - ( no  / total ) * math.log( no  / total, 2 ) )
+	yes = yesNo[0]; no = yesNo[1]
+	if no == 0 or yes == 0: return 0
+	total = no + yes
+	return ( -( yes / total ) * math.log( yes / total, 2 ) 
+			- ( no  / total ) * math.log( no  / total, 2 ) )
 
 def Gain( S, Attr ):
-    entropy_S = Entropy( resultsOfSet( S ) )
-    entropy_sum = 0
-    for label in AttributeLabels( S, Attr ):
-        subset_S = setWithLabel( S, Attr, label )
-        entropy_sum += ( ( len( subset_S ) / len( S ) ) * Entropy( resultsOfSet( subset_S ) ) )
-    return entropy_S - entropy_sum
+	entropy_S = Entropy( resultsOfSet( S ) )
+	entropy_sum = 0
+	for label in AttributeLabels( S, Attr ):
+		subset_S = setWithLabel( S, Attr, label )
+		entropy_sum += ( ( len( subset_S ) / len( S ) ) * Entropy( resultsOfSet( subset_S ) ) )
+	return entropy_S - entropy_sum
 
 
 
 
 # HELPER
 def indexOfAttribute( Attr ):
-    return attributes.index( Attr )
+	return attributes.index( Attr )
 
 def AttributeLabels( S, Attr ):
-    index = indexOfAttribute( Attr )
-    return list( set( [ row[ index ] for row in S ] ) )
+	index = indexOfAttribute( Attr )
+	return list( set( [ row[ index ] for row in S ] ) )
 
 def setWithLabel( S, Attr, Label ):
-    return list( filter( lambda row: row[ indexOfAttribute( Attr ) ] == Label, S ) )
+	return list( filter( lambda row: row[ indexOfAttribute( Attr ) ] == Label, S ) )
 
 def resultsOfSet( S ):
-    no = len( list( filter( lambda row: row[-1] is False, S ) ) )
-    return ( len( S ) - no, no )
+	no = len( list( filter( lambda row: row[-1] is False, S ) ) )
+	return ( len( S ) - no, no )
+
+def convertRowToDict( row ):
+	return { attributes[ i ] : row[ i ] for i in range( len( row ) ) }
+
+def extractDecisions( S ):
+	return [ row[-1] for row in S ]
+
+def compareDecisions( D1, D2 ):
+	return sum( [ 1 if D1[i] is D2[i] else 0 for i in range( min( len( D1 ), len( D2 ) ) ) ] ) / min( len( D1 ), len( D2 ) )
 
 def findBestAttribute( S, attrs ):
-    bestAttributeAndGain = ( 'temp attribute', -1 )
-    print( "+--  Gain  ---" )
-    for attr in attrs:
-        attrGain = Gain( S, attr )
-        print( "|", attr, "%0.7f" % ( attrGain ) )
-        if attrGain > bestAttributeAndGain[ 1 ]:
-            bestAttributeAndGain = ( attr, attrGain )
-    print( "+-------------" )
-    print( " > Best attribute:", bestAttributeAndGain[0], "\n" )
-    return bestAttributeAndGain[ 0 ]
+	bestAttributeAndGain = ( None, -1 ) if not pre_prune_tree else ( None, 0 )
+	#print( "+--  Gain  ---" )
+	for attr in attrs:
+		attrGain = Gain( S, attr )
+		#print( "|", attr, "%0.7f" % ( attrGain ) )
+		if attrGain > bestAttributeAndGain[ 1 ]:
+			bestAttributeAndGain = ( attr, attrGain )
+	#print( "+-------------" )
+	#print( " > Best attribute:", bestAttributeAndGain[0], "\n" )
+	return bestAttributeAndGain[ 0 ]
 
-def createNextNode( parent ):
+
+# Prediction is by higher percentage
+def getPrediction( S ):
+	res = resultsOfSet( S )
+	return True if res[ 0 ] > res[ 1 ] else False
+
+def createNextNodes( parent ):
 
 	if len( parent.attributes ) == 0: # No remaining attributes
 		return
 
-	falseParentDataSubset = setWithLabel( parent.dataSet, parent.attribute, False )
-	falseBestAttribute = findBestAttribute( falseParentDataSubset, parent.attributes )
-	parent.newFalsePath( falseBestAttribute, falseParentDataSubset )
-
 	trueParentDataSubset = setWithLabel( parent.dataSet, parent.attribute, True )
 	trueBestAttribute = findBestAttribute( trueParentDataSubset, parent.attributes )
-	parent.newTruePath( trueBestAttribute, trueParentDataSubset )
+	if trueBestAttribute is not None:
+		parent.newTruePath( trueBestAttribute, trueParentDataSubset )
+		createNextNodes( parent.truePath  )
 
-	createNextNode( parent.falsePath )
-	createNextNode( parent.truePath  )
+	falseParentDataSubset = setWithLabel( parent.dataSet, parent.attribute, False )
+	falseBestAttribute = findBestAttribute( falseParentDataSubset, parent.attributes )
+	if falseBestAttribute is not None:
+		parent.newFalsePath( falseBestAttribute, falseParentDataSubset )
+		createNextNodes( parent.falsePath )
+
+
 
 
 
 # ID3
-def createDecisionTree():
-    tree = DecisionTree.DecisionTree()
+def createDecisionTree( attrs, rows ):
 
-    rootAttributes = attributes[:-1]
-    bestAttribute = findBestAttribute( data, rootAttributes )
-    tree.newRoot( bestAttribute, rootAttributes, data )
-    createNextNode( tree.root )
+	tree = DecisionTree.DecisionTree( attrs )
 
-    return tree
+	rootAttributes = attrs[:-1]
+	bestAttribute = findBestAttribute( rows, rootAttributes )
+	
+	outcomes = [ row[-1] for row in rows ]
+	allSame = True
+	for outcome in outcomes:
+		if outcome != outcomes[0]: allSame = False; continue
+	
+	if allSame:
+		tree.newRoot( None, rootAttributes, rows )
+		return tree
 
+	tree.newRoot( bestAttribute, rootAttributes, rows )
 
+	createNextNodes( tree.root ) # Recursively builds tree
+
+	return tree
 
 
 
@@ -98,31 +127,31 @@ def createDecisionTree():
 
 # MAIN
 def main( argv ):
-    if len(argv) != 3:
-        return print( "ERROR: Usage \"python3 id3 <train> <test> <model>\"" )
+	if len(argv) != 3:
+		return print( "ERROR: Usage \"python3 id3.py <training-set> <test-set> <model-file>\"" )
 
-    tup = CSVReader.readBooleanCSV( argv[0] )
-    global attributes; attributes  = tup[ 0 ]
-    global data      ; data        = tup[ 1 ]
+	training_tup = CSVReader.readBooleanCSV( argv[ 0 ] )
+	global attributes; attributes = training_tup[ 0 ]
+	global data	  	 ; data		  = training_tup[ 1 ]
 
+	testing_tup = CSVReader.readBooleanCSV( argv[ 1 ] )
+	test_attributes = testing_tup[ 0 ]
+	test_data		= testing_tup[ 1 ]
+	test_decisions  = extractDecisions( test_data )
+	
+	print( "Attributes" )
+	print( ', '.join( attributes ), "\n" )
 
-    print( "Attributes:\n", ', '.join( attributes ), "\n" )
+	tree = createDecisionTree( attributes, data )
 
-    #print( indexOfAttribute( "XD" ) )
-    #print( AttributeLabels( data, "XD" ) )
+	predictions = [ getPrediction( tree.dataSetFromDecisions( convertRowToDict( row ) ) ) for row in test_data ]
 
-    #for row in setWithLabel( data, "XD", 1 ):
-        #print( row )
+	print( "\nPrediction accuracy vs. testing data:", "{}%\n\n".format( 100 * compareDecisions( predictions, test_decisions ) ) )
 
-    #print( resultsOfSet( setWithLabel( data, "XD", 1 ) ) )
-    #print( Gain( data, "XF" ) )
+	tree.printTree( argv[2] )
 
-    tree = createDecisionTree()
-    
-    temp = tree.dataSetFromDecisions( { "XD":0, "XE":1, "XF":0 } )
-    print( resultsOfSet( temp ) )
 
 
 
 if __name__=='__main__':
-    main( sys.argv[1:] )
+	main( sys.argv[1:] )
