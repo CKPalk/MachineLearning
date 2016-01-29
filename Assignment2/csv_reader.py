@@ -19,7 +19,7 @@ def readIntegerCSV( filename ):
 	return( attributes, relations )
 
 def convertToPosNegOne( data ):
-	return( data[0], [ [ 1 if elem is '1' else -1 for elem in row ] for row in data[1] ] )
+	return( data[0], [ [ 1 if elem is 1 else -1 for elem in row ] for row in data[1] ] )
 
 def readCSV( filename ):
 	data = None

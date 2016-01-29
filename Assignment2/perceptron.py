@@ -19,7 +19,11 @@ def main( argv ):
 
 	perceptron = my_perceptron.Perceptron()
 	perceptron.perceptronTrain( Training_Data, max_perceptron_training_iterations )
-	print( perceptron.perceptronTestResults( Training_Data ) )
+
+	results = perceptron.perceptronTestResults( Training_Data )
+	print( results )
+	
+	perceptron.outputModelToFile( argv[ 2 ] )
 
 
 if __name__=='__main__':

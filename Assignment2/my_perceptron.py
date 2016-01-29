@@ -6,11 +6,13 @@ class Perceptron( object ):
 		self.w = None
 		self.D = 0
 		self.b = 0
+		self.attrs = None
 
 	# Algorithm Body:
 	def perceptronTrain( self, Data, MaxIter ):
 		self.w = [ 0 for _ in Data.attributes ]
 		self.D = len( self.w )
+		self.attrs = Data.attributes
 		self.b = 0
 		for i in range( MaxIter ):
 			for x, y in Data.getRowsTuples():
@@ -18,6 +20,7 @@ class Perceptron( object ):
 				if ( y * a ) <= 0:
 					self.w = [ self.w[d] + ( y * x[d] ) for d in range( self.D ) ]
 					self.b += y
+					#print( "Updated weights:", self.w, "bias:", self.b )
 			print( "Finished iteration", i )
 
 
@@ -42,4 +45,9 @@ class Perceptron( object ):
 	# Support Methods: 
 	def sign( self, a ):
 		return 1 if a > 0 else 0
-	
+
+	def outputModelToFile( self, filename ):
+		with open( filename, 'w+' ) as model_file:
+			model_file.write( str(self.b) )
+			for d in range( self.D ):
+				model_file.write( self.attrs[d], self.w[d] )
