@@ -28,11 +28,11 @@ class Perceptron( object ):
 		a = self.activation( row )
 		return self.sign( a )
 
-	def perceptronTestResults( self, Data ):
+	def perceptronPredictionResults( self, Data ):
 		if self.w is None:
-			print( "Perceptron must be trained first with .perceptronTrain( Data, MaxIter )" ); return 0
+			print( "Perceptron must be trained first with .perceptronTrain( Data, MaxIter )" )
+			return 0
 		perceptron_results = [ self.perceptronTest( row ) for row in Data.rows ]
-		print( perceptron_results )
 		return Data.compareTrueResultsWith( perceptron_results )
 
 	def activation( self, row ):
@@ -44,10 +44,10 @@ class Perceptron( object ):
 	
 	# Support Methods: 
 	def sign( self, a ):
-		return 1 if a > 0 else 0
+		return 1 if a > 0 else -1
 
 	def outputModelToFile( self, filename ):
 		with open( filename, 'w+' ) as model_file:
 			model_file.write( str(self.b) )
 			for d in range( self.D ):
-				model_file.write( self.attrs[d], self.w[d] )
+				model_file.write( str( self.attrs[d] ) + " " + str( self.w[d] ) + "\n" )
