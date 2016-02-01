@@ -15,11 +15,16 @@ class Perceptron( object ):
 		self.attrs = Data.attributes
 		self.b = 0
 		for i in range( MaxIter ):
+			changed = False
 			for x, y in Data.getRowsTuples():
 				a = self.activation( x )
 				if ( y * a ) <= 0:
+					changed = True
 					self.w = [ self.w[d] + ( y * x[d] ) for d in range( self.D ) ]
 					self.b += y
+			if not changed:
+				print( "Nothing changed on this pass, breaking out at", i, "iterations." )
+				return
 
 
 	def perceptronTest( self, row ):
