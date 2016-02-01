@@ -1,13 +1,13 @@
 
+import random
 import csv_reader
 
 class Data( object ):
 
 	def __init__( self, filename ):
 		reader_data 	= csv_reader.convertToPosNegOne( csv_reader.readIntegerCSV( filename ) )
-		#reader_data 	= csv_reader.readIntegerCSV( filename )
 		self.attributes = reader_data[ 0 ][:-1] # Remove 'class' attribute
-		self.rows  	= reader_data[ 1 ]		# All rows in a [[]]
+		self.rows  		= reader_data[ 1 ]		# All rows in a [[]]
 
 	def getRowsTuples( self ):
 		return [ ( row[:-1], row[-1] ) for row in self.rows ]
@@ -23,3 +23,6 @@ class Data( object ):
 		for row in range( rows_count ):
 			correct_rows_count += ( 1 if results[ row ] == self.rows[ row ][ -1 ] else 0 )
 		return ( correct_rows_count / rows_count ) * 100
+
+	def shuffleRows( self ):
+		random.shuffle( self.rows )

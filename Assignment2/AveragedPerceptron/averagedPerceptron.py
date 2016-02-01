@@ -6,13 +6,12 @@ import my_perceptron
 
 # TWEAKING VARIABLES
 
-max_perceptron_training_iterations = 50
-max_perceptron_testing_iterations  = 50
+max_perceptron_iterations = 100
 
 
 def printResults( data_name, result_unrounded ):
 	print( "RESULTS FOR", data_name.upper() )
-	print( "{:.2f}% correct prediction on {}".format( round( result_unrounded, 2 ), data_name.lower() ) )
+	print( "{:.2f}% correct prediction on {}\n".format( round( result_unrounded, 2 ), data_name.lower() ) )
 
 
 
@@ -26,20 +25,39 @@ def main( argv ):
 
 	# Create Perceptron
 	perceptron = my_perceptron.Perceptron()
+	# He's about to go to school
 
-	for iterations in range( max_perceptron_training_iterations ):
 
-		print( "\n\n Predictions results with", iterations, "iterations of learning:" )
 
-		# Train Perceptron from Training Data
-		perceptron.averagedPerceptronTrain( Training_Data, iterations )
+	perceptron.averagedPerceptronTrain( Training_Data, max_perceptron_iterations )
 
-		# Use perceptron to predict results
-		resultsPercentage = perceptron.perceptronPredictionResults( Training_Data )
-		printResults( "Training Data", resultsPercentage )
+	print( "\nPredictions results with", max_perceptron_iterations, "iterations of learning the training data:\n" )
 
-		resultsPercentage = perceptron.perceptronPredictionResults( Testing_Data )
-		printResults( "Testing Data", resultsPercentage )
+	resultsPercentage = perceptron.perceptronPredictionResults( Training_Data )
+	printResults( "Training Data", resultsPercentage )
+
+	resultsPercentage = perceptron.perceptronPredictionResults( Testing_Data )
+	printResults( "Testing Data", resultsPercentage )
+
+	
+
+
+	# Shuffle the training data and have the perceptron relearn using the shuffled rows
+	Training_Data.shuffleRows()
+
+
+	perceptron.averagedPerceptronTrain( Training_Data, max_perceptron_iterations )
+
+	print( "\nPredictions results with", max_perceptron_iterations, "iterations of learning the shuffled training data:\n" )
+
+	resultsPercentage = perceptron.perceptronPredictionResults( Training_Data )
+	printResults( "Training Data", resultsPercentage )
+
+	resultsPercentage = perceptron.perceptronPredictionResults( Testing_Data )
+	printResults( "Testing Data", resultsPercentage )
+	
+
+
 
 	perceptron.outputModelToFile( argv[ 2 ] )
 
