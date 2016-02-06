@@ -6,12 +6,12 @@ import my_perceptron
 
 # TWEAKING VARIABLES
 
-max_perceptron_iterations = 100
+max_perceptron_iterations = 50
 
 
 def printResults( data_name, result_unrounded ):
 	print( "RESULTS FOR", data_name.upper() )
-	print( "{:.2f}% correct prediction on {}".format( round( result_unrounded, 2 ), data_name.lower() ) )
+	print( "{:.2f}% correct prediction on {}\n".format( round( result_unrounded, 2 ), data_name.lower() ) )
 
 
 
@@ -26,7 +26,7 @@ def main( argv ):
 	# Create Perceptron
 	perceptron = my_perceptron.Perceptron()
 
-	print( "\n\nPredictions results with", max_perceptron_iterations, "iterations of learning:" )
+	print( "\n\nPredictions results with", max_perceptron_iterations, "iterations of learning:\n" )
 
 	# Train Perceptron from Training Data
 	perceptron.perceptronTrain( Training_Data, max_perceptron_iterations )

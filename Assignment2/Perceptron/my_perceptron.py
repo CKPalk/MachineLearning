@@ -1,6 +1,10 @@
 
+import random
+
 
 class Perceptron( object ):
+
+	randomize_w_and_b = False
 
 	def __init__( self ):
 		self.w = None
@@ -10,10 +14,10 @@ class Perceptron( object ):
 
 	# Algorithm Body:
 	def perceptronTrain( self, Data, MaxIter ):
-		self.w = [ 0 for _ in Data.attributes ]
+		self.w = [ random.uniform( -1, 1 ) if self.randomize_w_and_b else 0 for _ in Data.attributes ]
 		self.D = len( self.w )
 		self.attrs = Data.attributes
-		self.b = 0
+		self.b = random.uniform( -1, 1 ) if self.randomize_w_and_b else 0
 		for i in range( MaxIter ):
 			changed = False
 			for x, y in Data.getRowsTuples():
@@ -70,6 +74,6 @@ class Perceptron( object ):
 
 	def outputModelToFile( self, filename ):
 		with open( filename, 'w+' ) as model_file:
-			model_file.write( str(self.b) + "\n" )
+			model_file.write( str( round( self.b, 2 ) ) + "\n" )
 			for d in range( self.D ):
-				model_file.write( str( self.attrs[d] ) + " " + str( self.w[d] ) + "\n" )
+				model_file.write( str( self.attrs[d] ) + " " + str( round( self.w[d], 5 ) ) + "\n" )
