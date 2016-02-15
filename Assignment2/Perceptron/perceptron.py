@@ -6,7 +6,7 @@ import my_perceptron
 
 # TWEAKING VARIABLES
 
-max_perceptron_iterations = 50
+max_perceptron_iterations = 100
 
 
 def printResults( data_name, result_unrounded ):
@@ -27,18 +27,31 @@ def main( argv ):
 	perceptron = my_perceptron.Perceptron()
 
 	print( "\n\nPredictions results with", max_perceptron_iterations, "iterations of learning:\n" )
-
-	# Train Perceptron from Training Data
 	perceptron.perceptronTrain( Training_Data, max_perceptron_iterations )
 
-	# Use perceptron to predict results
+	resultsPercentage = perceptron.perceptronPredictionResults( Training_Data )
+	printResults( "Training Data", resultsPercentage )
+
+	resultsPercentage = perceptron.perceptronPredictionResultsAndPrintActivations( Testing_Data )
+	printResults( "Testing Data", resultsPercentage )
+
+	perceptron.outputModelToFile( argv[ 2 ] )
+	print( "Weights and bias recorded for", max_perceptron_iterations, "iterations in", argv[ 2 ], "\n" );
+
+
+
+	print( "\n\nAlso predictiong results with 50 iterations of learning because I get better percentages:\n" )
+	perceptron.perceptronTrain( Training_Data, 50 )
+
 	resultsPercentage = perceptron.perceptronPredictionResults( Training_Data )
 	printResults( "Training Data", resultsPercentage )
 
 	resultsPercentage = perceptron.perceptronPredictionResults( Testing_Data )
 	printResults( "Testing Data", resultsPercentage )
 
-	perceptron.outputModelToFile( argv[ 2 ] )
+	print( "Weights and bias of output file will still reflect the", max_perceptron_iterations, "iteration test above.\n\n" )
+
+
 
 
 if __name__=='__main__':

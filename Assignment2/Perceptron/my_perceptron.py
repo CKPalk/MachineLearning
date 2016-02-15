@@ -35,23 +35,28 @@ class Perceptron( object ):
 		a = self.activation( row )
 		return self.sign( a )
 
+	def perceptronTestAndPrint( self, row ):
+		a = self.activation( row )
+		print( a )
+		return self.sign( a )
 
-	def perceptronPredictions( self, Data ):
+
+	def perceptronPredictions( self, Data, printBool ):
 		if self.w is None:
 			print( "Perceptron must be trained first with .perceptronTrain( Data, MaxIter )" )
 			return
-		return [ self.perceptronTest( row ) for row in Data.rows ]
+		if printBool:
+			return [ self.perceptronTestAndPrint( row ) for row in Data.rows ]
+		else:
+			return [ self.perceptronTest( row ) for row in Data.rows ]
 
 
 	def perceptronPredictionResults( self, Data ):
-		return Data.compareTrueResultsWith( self.perceptronPredictions( Data ) )
+		return Data.compareTrueResultsWith( self.perceptronPredictions( Data, False ) )
 
 
 	def perceptronPredictionResultsAndPrintActivations( self, Data ):
-		perceptronPredictions = self.perceptronPredictions( Data )
-		for i in range( len( perceptronPredictions ) ):
-			print( "Row", i, "returned:", self.forceOneOrZero( perceptronPredictions[ i ] ) )
-		return Data.compareTrueResultsWith( perceptronPredictions )
+		return Data.compareTrueResultsWith( self.perceptronPredictions( Data, True ) )
 
 
 	def activation( self, row ):

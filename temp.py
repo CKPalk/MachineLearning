@@ -6,7 +6,6 @@ import itertools
 min_sup  = 0.60
 min_conf = 0.75
 
-
 transactions = [ 
 	set( list( 'ABCDEF' ) ),
 	set( list( 'BHSCFT' ) ),
@@ -14,6 +13,17 @@ transactions = [
 	set( list( 'OAECFG' ) ),
 	set( list( 'XACDEF' ) )
 ]
+'''
+
+transactions = [ 
+	set( list( 'ZBCDEF' ) ),
+	set( list( 'BHSCFT' ) ),
+	set( list( 'UZFWD' ) ),
+	set( list( 'ZECFG' ) ),
+	set( list( 'XZCDEF' ) )
+]
+'''
+
 
 
 def transactionsWith( test_set, transactions ):
@@ -37,12 +47,18 @@ def printConfidencesFor( test_set, transactions, support, stream_out ):
 		stream_out.write( res )
 
 def subsetsOfLength( length ):
-	possible = set( list( 'ABCDEFHSTOUFWDOAECFGX' ) )
-	return set( itertools.combinations( possible, length ) )
+	possible = set( list( 'AOBCDEFHSTUFWDECFGX' ) )
+	possible2 = set( list( 'FACDE' ) )
+	return set( itertools.combinations( possible2, length ) )
 
 
 def main( argv ):
 	print( transactions )
+
+	possible = set( list( 'STUWX' ) )
+	for pos in possible:
+		print( pos, ":", supportFor( set(pos), transactions ) )
+	print( subsetsOfLength( 4 ) )
 	with open( argv[0], 'w+' ) as stream_out:
 		for length in range( 2, 5 ):
 			stream_out.write( "\n--- Associations of length {} ---\n".format( length ) )
