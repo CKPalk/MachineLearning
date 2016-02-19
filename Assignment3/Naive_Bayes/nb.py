@@ -9,6 +9,8 @@ def main( argv ):
 		testing_data  	= csv_reader.
 		beta 			= float( argv[ 2 ] )
 		model			= csv_reader.
+	catch KeyError:
+
 
 if __name__=='__main__':
 	main( sys.argv[ 1: ] )
