@@ -15,7 +15,7 @@ def convertToZeroOne( data ):
 def convertToPosNegOne( data ):
 	return( data[0], [ [ 1 if elem is 1 else -1 for elem in row ] for row in data[1] ] )
 #
-
+#
 
 
 '''
