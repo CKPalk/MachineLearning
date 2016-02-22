@@ -4,7 +4,7 @@ from collections import namedtuple
 
 class Data( object ):
 
-	def __init__( self, filename, reader_fun, converter_fun ):
+	def __init__( self, filename, reader_fun, converter_fun=lambda x: x ):
 		Row = namedtuple( 'Row', [ 'X', 'Y' ] )
 		reader_data 	= converter_fun( reader_fun( filename ) )
 		self.attributes = reader_data[ 0 ][ :-1 ] # Remove 'class' attribute
