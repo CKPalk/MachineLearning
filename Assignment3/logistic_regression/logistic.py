@@ -38,7 +38,7 @@ def trainWithGradientAscent( data, eta, lamda, start_time ):
 		for i in range( len( W ) ): # For each linear unit weight w[i], Do
 			W[i] = W[i] + del_w[i] - ( eta * lamda * W[i] )# w[i] = w[i] + del_w[i]
 		b = b + del_b - ( eta * lamda * 1 )
-		if magnitude( del_w ) < 0.001:
+		if magnitude( del_w ) < 0.01:
 			return W, b
 		elif counter % 10 == 0:
 			print( "{:^10}".format( str(round( time.time() - start_time, 3 )) + "s" ), "  {:^8}   {:^19}".format( counter, round( magnitude( del_w ), 6 ) ) )
