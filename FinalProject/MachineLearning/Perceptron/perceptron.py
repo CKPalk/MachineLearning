@@ -2,6 +2,8 @@
 
 import sys
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
 def main( argv ):
 	try:
@@ -10,6 +12,7 @@ def main( argv ):
 		output_filename = argv[ 3 ]
 	except IndexError:
 		print( "Error, usage: \"python3 {} <training> <testing> <output>\"".format( argv[ 0 ] ) ) 
+		return
 
 	
 	Training_DataFrame = pd.read_csv( training_filename )
@@ -23,20 +26,24 @@ def main( argv ):
 	testing_X = Testing_DataFrame.ix[:,0:-1]
 	testing_Y = Testing_DataFrame.ix[:,-1]
 
-	from sklearn.ensemble import RandomForestClassifier
-	
-	my_n_estimators = 1000 # default 10
 
-	classifier = RandomForestClassifier( n_estimators = my_n_estimators )
-	classifier.fit( X, Y )
+	'''
+		Perceptron
+	'''
+	from sklearn.linear_model import Perceptron
 
-	predicted_cuisines = classifier.predict( testing_X )
+	# Hyper Parameters:
+	alpha 	= 0.0001
+	n_iter 	= 20
 
-	score = classifier.score( testing_X, testing_Y )
+	# Fit Classifier
+	P_classifier = Perceptron( alpha = alpha, n_iter = n_iter )
+	P_classifier.fit( X, Y )
 
-	
-	print( "Your mean accuracy:", score )
+	# Report results
+	P_score = P_classifier.score( testing_X, testing_Y )
 
+	print( "\nPerceptron Accuracy:", P_score )
 	#
 
 
