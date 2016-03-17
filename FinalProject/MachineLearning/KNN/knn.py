@@ -6,8 +6,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime
 
-
-
 def main( argv ):
 	try:
 		training_filename  = argv[ 1 ]
@@ -26,29 +24,33 @@ def main( argv ):
 
 	Testing_DataFrame = pd.read_csv( testing_filename )
 	
-	testing_X = Testing_DataFrame.ix[:,0:-1]
-	testing_Y = Testing_DataFrame.ix[:,-1]
+	test_X = Testing_DataFrame.ix[:,0:-1]
+	test_Y = Testing_DataFrame.ix[:,-1]
 
 
 	'''
 		Perceptron
 	'''
-	from sklearn.linear_model import Perceptron
+	from sklearn.neighbors import KNeighborsClassifier
 
 	# Hyper Parameters:
-	alpha 	= 0.0001
-	n_iter 	= 20
+	n_neighbors = 5
 
 	# Fit Classifier
+	KNN_classifier = KNeighborsClassifier( 
+		n_neighbors = n_neighbors
+	)
+
 	print( "{} Started training".format( str( datetime.now() ) ) )
-	P_classifier = Perceptron( alpha = alpha, n_iter = n_iter )
-	P_classifier.fit( X, Y )
+	KNN_classifier.fit( X, Y )
 	print( "{} Stopped training".format( str( datetime.now() ) ) )
 
 	# Report results
-	P_score = P_classifier.score( testing_X, testing_Y )
+	print( "{} Started testing".format( str( datetime.now() ) ) )
+	score = KNN_classifier.score( test_X, test_Y )
+	print( "{} Stopped testing".format( str( datetime.now() ) ) )
 
-	print( "\nPerceptron Accuracy:", P_score )
+	print( "\nK-NN with {} cluster has Accuracy: {}%".format( n_neighbors, round( score * 100, 3 ) ) )
 	#
 
 

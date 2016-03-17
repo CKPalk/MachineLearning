@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+from datetime import datetime
 
 def displayAccuracyGraph( X, Y ):
 
@@ -18,6 +19,12 @@ def displayAccuracyGraph( X, Y ):
 	plt.xlabel( 'Trees in Forest' )
 	plt.grid( True )
 	plt.show()
+
+def printStart( n ):
+	print( "{} Started training {} trees".format( str( datetime.now() ), n ) )
+
+def printStop( n ):
+	print( "{} Stopped training {} trees".format( str( datetime.now() ), n ) )
 
 
 def main( argv ):
@@ -75,12 +82,16 @@ def main( argv ):
 		test_Y = Testing_DataFrame.ix[:,-1]
 	
 		for n_trees in range( start_idx, max_n_estimators + 1 ):
-	
+
+			printStart( n_trees )
+
 			RF_classifier = RandomForestClassifier( 
 				n_estimators = n_trees,
 				min_samples_split = 10
 			)
 			RF_classifier.fit( X, Y )
+
+			printStop( n_trees )
 	
 			RF_score = RF_classifier.score( test_X, test_Y )
 			tree_accuracies.append( ( n_trees, RF_score ) )

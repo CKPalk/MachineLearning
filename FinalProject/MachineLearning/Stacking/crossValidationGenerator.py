@@ -34,16 +34,13 @@ def splitSamples( samples, split_count ):
 			test_samples  = samples[ start_idx : ]
 			train_samples = samples[ : start_idx ]
 
-		print( len( test_samples ) )
-		print( len( train_samples ) )
-
 		splits.append( ( train_samples, test_samples ) )
 
 	return splits
 
 
 
-def processSplit( headers, samples, splits_count ):
+def processSplit( headers, samples, splits_count, logging=False ):
 
 	splits = splitSamples( samples, splits_count )
 
@@ -57,47 +54,47 @@ def processSplit( headers, samples, splits_count ):
 
 		filenames.append( ( test_filename, train_filename ) )
 
-		test_matrix  = [ headers ] + split[ 0 ]
-		train_matrix = [ headers ] + split[ 1 ]
+		test_matrix  = [ headers ] + split[ 1 ]
+		train_matrix = [ headers ] + split[ 0 ]
 
 		with open( test_filename, 'w+' ) as test_stream:
 			test_stream.write( '\n'.join( test_matrix ) )
 
 		with open( train_filename, 'w+' ) as train_stream:
 			train_stream.write( '\n'.join( train_matrix ) )
+	
+		if logging:
+			print( "{} has been written with line count: {}".format( test_filename,  repr( len( test_matrix  ) ) ) )
+			print( "{} has been written with line count: {}".format( train_filename, repr( len( train_matrix ) ) ) )
 
-		print( "{} has been written with line count: {}".format( test_filename,  repr( len( test_matrix  ) ) ) )
-		print( "{} has been written with line count: {}".format( train_filename, repr( len( train_matrix ) ) ) )
-
-	print( "All files complete. Files:\n"  )
+	print( "File splits created. Files:\n"  )
 	print( *filenames, sep='\n' )
 	print()
 
 
 
 
-def main( argv ):
-	try:
-
-		splits_count = int ( argv[ 1 ] )
-		csv_stream   = open( argv[ 2 ], 'r' )
+def splitData( csv_filename, splits ):
+	
+	splits_count = splits
+	csv_stream   = open( csv_filename, 'r' )
 		
-		data_matrix = csv_stream.read().split( '\n' )
+	data_matrix = csv_stream.read().split( '\n' )
 
-		headers = data_matrix[ 0  ]
-		samples = data_matrix[ 1: ]
+	headers = data_matrix[ 0  ]
+	samples = data_matrix[ 1: ]
 		
-		processSplit( headers, samples, splits_count )
-
-	except IndexError:
-		print( "Error, usage: \"python3 {} <splits> <CSV>\"".format( argv[ 0 ] ) ) 
-	except ValueError:
-		print( "Error, need an integer value for split count" )
+	processSplit( headers, samples, splits_count )
 #
 
 
 if __name__=='__main__':
-	main( sys.argv )
+	try:
+		splitData( int( sys.argv[ 1 ] ), sys.argv[ 2 ] )
+	except IndexError:
+		print( "Error, usage: \"python3 {} <splits> <CSV>\"".format( argv[ 0 ] ) ) 
+	except ValueError:
+		print( "Error, need an integer value for split count" )
 #
 
 
